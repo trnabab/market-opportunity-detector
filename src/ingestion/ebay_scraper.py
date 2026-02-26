@@ -9,6 +9,10 @@ import os
 from datetime import datetime
 from dotenv import load_dotenv
 import requests
+import spacy
+
+# Load the spacy model
+nlp = spacy.load("en_core_web_sm")
 
 # Load environment variables
 load_dotenv()
@@ -128,7 +132,7 @@ def search_ebay(keyword, limit=50):
     }
 
 
-def browse_category(category_id, limit=50):
+def browse_category(category_id, seed_keyword, limit=50):
     """
     Browse an eBay category and return product listings.
 
@@ -147,6 +151,7 @@ def browse_category(category_id, limit=50):
     }
 
     params = {
+        "q": seed_keyword,
         "category_ids": category_id,
         "limit": min(limit, 200),  # eBay max is 200
     }
@@ -184,89 +189,34 @@ def browse_category(category_id, limit=50):
     return all_items
 
 
-def extract_keywords(titles):
+def extract_keywords(titles, stop_words):
     """
-    Extract product keywords from a list of eBay titles.
-
-    Returns a list of unique keywords.
+    Extract product keywords from titles using NLP.
     """
-    # Words to ignore
-    stop_words = {
-        "exercise",
-        "fitness",
-        "equipment",
-        "training",
-        "strength",
-        "set",
-        "pack",
-        "kit",
-        "home",
-        "gym",
-        "new",
-        "brand",
-        "quality",
-        "for",
-        "with",
-        "and",
-        "the",
-    }
-
     keywords = []
+    stop_words_set = set(word.lower() for word in stop_words)
 
     for title in titles:
-        # Split title into words
-        words = title.lower().split()
+        doc = nlp(title.lower())
 
-        # Remove stop words
-        words = [word for word in words if word not in stop_words]
-
-        # Remove numbers
-        words = [word for word in words if not word[0].isdigit()]
-
-        # Take first 3 words
-        keyword = " ".join(words[:2])
-
-        # Add keywords to list
-        if keyword:
-            keywords.append(keyword)
+        for chunk in doc.noun_chunks:
+            # Get the noun phrase text
+            phrase = chunk.text.strip()
+            # Skip if phrase is too long
+            if len(phrase.split()) > 3:
+                continue
+            # Skip if phrase contains numbers or measurements
+            if any(
+                token.like_num or token.text in ["kg", "cm", "mm", "lb", "lbs"]
+                for token in chunk
+            ):
+                continue
+            # Skip if phrase is in stop words
+            if phrase.lower() in stop_words_set:
+                continue
+            # Add to keywords list
+            keywords.append(phrase)
 
     return list(set(keywords))
 
 
-def search_multiple(keywords):
-    """Search eBay for multiple keywords, return list of results."""
-    results = []
-    for keyword in keywords:
-        print(f"Searching: {keyword}...")
-        result = search_ebay(keyword)
-        results.append(result)
-
-        if result["success"]:
-            print(
-                f"  Found {result['total_results']} results, avg ${result['avg_price']}"
-            )
-        else:
-            print(f"  Error: {result.get('error')}")
-
-    return results
-
-
-# Quick test
-if __name__ == "__main__":
-    # Test with a few keywords
-    test_keywords = ["dumbbells", "yoga mat", "resistance bands"]
-
-    print("=" * 50)
-    print("eBay Search Test")
-    print("=" * 50)
-
-    results = search_multiple(test_keywords)
-
-    print("\n" + "=" * 50)
-    print("Summary")
-    print("=" * 50)
-    for r in results:
-        if r["success"]:
-            print(
-                f"{r['keyword']}: {r['total_results']} results, ${r['avg_price']} avg, {r['unique_sellers']} sellers"
-            )

@@ -7,3 +7,6 @@ pytrends
 
 # Data handling
 pandas
+
+# NLP
+spacy
