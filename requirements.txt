@@ -1,2 +1,9 @@
-pytrends==4.9.2
-python-dotenv==1.2.1
+# API requests
+requests
+python-dotenv
+
+# Google Trends
+pytrends
+
+# Data handling
+pandas
