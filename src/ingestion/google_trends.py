@@ -78,7 +78,7 @@ def filter_rising_keywords(trends_df):
 
     Returns list of keyword names that are trending upward.
     """
-    rising = []
+    rising_map = {}
 
     for keyword in trends_df.columns:
         # Skip the 'isPartial' column that pytrends adds
@@ -92,8 +92,6 @@ def filter_rising_keywords(trends_df):
         previous_4_weeks = data.tail(8).head(4).mean()
         # If last 4 weeks is greater than previous 4 weeks, add to rising list
         if last_4_weeks > previous_4_weeks:
-            rising.append(keyword)
+            rising_map[keyword] = data.tail(12).tolist()
 
-    return rising
-
-
+    return rising_map

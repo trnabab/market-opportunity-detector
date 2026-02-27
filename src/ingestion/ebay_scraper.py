@@ -12,7 +12,7 @@ import requests
 import spacy
 
 # Load the spacy model
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_md")
 
 # Load environment variables
 load_dotenv()
@@ -189,34 +189,75 @@ def browse_category(category_id, seed_keyword, limit=50):
     return all_items
 
 
-def extract_keywords(titles, stop_words):
+def is_relevant(phrase, anchors, blacklist=None, threshold=0.35):
+    """
+    Check if phrase is relevant to category.
+
+    1. Reject if similar to any blacklist word
+    2. Accept if average of top 2 anchor scores >= threshold
+    """
+    phrase_doc = nlp(phrase)
+
+    if not phrase_doc.has_vector:
+        return False
+
+    # Step 1: Check blacklist
+    if blacklist:
+        for bad_word in blacklist:
+            bad_doc = nlp(bad_word)
+            if phrase_doc.similarity(bad_doc) >= 0.5:
+                return False
+
+    # Step 2: Check positive anchors (top 2 average)
+    scores = []
+    for anchor in anchors:
+        anchor_doc = nlp(anchor)
+        scores.append(phrase_doc.similarity(anchor_doc))
+
+    scores.sort(reverse=True)
+    top_2_avg = sum(scores[:2]) / min(2, len(scores))
+
+    return top_2_avg >= threshold
+
+
+def extract_keywords(products, stop_words, anchors, blacklist=None):
     """
     Extract product keywords from titles using NLP.
     """
-    keywords = []
+    keyword_map = {}
     stop_words_set = set(word.lower() for word in stop_words)
 
-    for title in titles:
+    for product in products:
+        title = product.get("title", "")
+        if not title:
+            continue
+
         doc = nlp(title.lower())
 
         for chunk in doc.noun_chunks:
-            # Get the noun phrase text
             phrase = chunk.text.strip()
-            # Skip if phrase is too long
-            if len(phrase.split()) > 3:
+
+            # Skip if phrase is too long or too short
+            if len(phrase.split()) > 3 or len(phrase) < 3:
                 continue
+
             # Skip if phrase contains numbers or measurements
             if any(
                 token.like_num or token.text in ["kg", "cm", "mm", "lb", "lbs"]
                 for token in chunk
             ):
                 continue
+
             # Skip if phrase is in stop words
             if phrase.lower() in stop_words_set:
                 continue
-            # Add to keywords list
-            keywords.append(phrase)
 
-    return list(set(keywords))
+            # Skip if not relevant (semantic filter - expensive, do last)
+            if not is_relevant(phrase, anchors, blacklist):
+                continue
 
+            if phrase not in keyword_map:
+                keyword_map[phrase] = []
+            keyword_map[phrase].append(product)
 
+    return keyword_map

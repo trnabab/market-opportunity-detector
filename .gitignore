@@ -207,3 +207,4 @@ marimo/_lsp/
 __marimo__/
 .DS_Store
 PROJECT_PLAN.md
+test.py
