@@ -9,7 +9,7 @@ Finds trending products with low competition by combining Google Trends (demand)
 3. Filters keywords using semantic similarity (word embeddings)
 4. Checks if demand is rising on Google Trends
 5. Calculates features: trend momentum, acceleration, competition density, price spread
-6. Calculates an "opportunity score" based on demand vs competition (coming soon)
+6. Calculates an "opportunity score" (0-100) using weighted features
 
 ## Setup
 
@@ -45,6 +45,8 @@ src/
     discovery.py       # Discovery pipeline orchestration
   processing/
     features.py        # Feature engineering (momentum, competition, etc.)
+  scoring/
+    opportunity.py     # Opportunity scoring and ranking
 ```
 
 ## Current Status
@@ -56,6 +58,6 @@ src/
 - [x] Rising keyword detection
 - [x] Discovery pipeline
 - [x] Feature engineering (Phase 2)
-- [ ] Opportunity scoring (Phase 3)
+- [x] Opportunity scoring (Phase 3)
 - [ ] Database storage (Phase 4)
 - [ ] Dashboard (Phase 6)

@@ -208,3 +208,9 @@ __marimo__/
 .DS_Store
 PROJECT_PLAN.md
 test.py
+
+# Historical data (for ML training later)
+data/history/
+
+# Weekly collection script (personal automation)
+scripts/
