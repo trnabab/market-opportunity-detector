@@ -10,3 +10,8 @@ pandas
 
 # NLP
 spacy
+
+# Database
+sqlalchemy
+psycopg2-binary
+alembic
