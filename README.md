@@ -19,17 +19,36 @@ pip install -r requirements.txt
 python -m spacy download en_core_web_md
 ```
 
-2. Create a `.env` file with your eBay API credentials:
+2. Start PostgreSQL with Docker:
+```bash
+docker run -d --name market-db \
+  -e POSTGRES_PASSWORD=dev \
+  -e POSTGRES_DB=market_opportunities \
+  -p 5432:5432 postgres
+```
+
+3. Create a `.env` file with your credentials:
 ```
 EBAY_APP_ID=your_app_id_here
 EBAY_CERT_ID=your_cert_id_here
+DATABASE_URL=postgresql://postgres:dev@localhost:5432/market_opportunities
 ```
 
 Get eBay credentials at: https://developer.ebay.com/
 
+4. Run database migrations:
+```bash
+alembic upgrade head
+```
+
 ## Usage
 
-Run the discovery pipeline:
+Run the weekly data collection (discovers opportunities and saves to database):
+```bash
+python scripts/collect_weekly.py
+```
+
+Or run just the discovery pipeline (no database):
 ```bash
 cd src/ingestion
 python discovery.py
