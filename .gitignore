@@ -211,6 +211,3 @@ test.py
 
 # Historical data (for ML training later)
 data/history/
-
-# Weekly collection script (personal automation)
-scripts/

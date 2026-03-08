@@ -47,6 +47,12 @@ src/
     features.py        # Feature engineering (momentum, competition, etc.)
   scoring/
     opportunity.py     # Opportunity scoring and ranking
+  storage/
+    database.py        # SQLAlchemy engine and session
+    models.py          # Database models (Category, Keyword, etc.)
+    crud.py            # CRUD operations for persistence
+scripts/
+  collect_weekly.py    # Weekly data collection script
 ```
 
 ## Current Status
@@ -59,5 +65,6 @@ src/
 - [x] Discovery pipeline
 - [x] Feature engineering (Phase 2)
 - [x] Opportunity scoring (Phase 3)
-- [ ] Database storage (Phase 4)
+- [x] Database storage (Phase 4)
+- [ ] Pipeline automation (Phase 5)
 - [ ] Dashboard (Phase 6)
