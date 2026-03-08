@@ -1,3 +1,9 @@
+"""
+CRUD operations for database persistence.
+
+Handles create, read, update for categories, keywords, snapshots, and scores.
+"""
+
 from datetime import datetime
 from storage.database import get_session
 from storage.models import Category, Keyword, DailySnapshot, OpportunityScore

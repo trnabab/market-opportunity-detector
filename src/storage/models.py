@@ -1,3 +1,9 @@
+"""
+SQLAlchemy models for database tables.
+
+Defines Category, Keyword, DailySnapshot, and OpportunityScore.
+"""
+
 from sqlalchemy import (
     Column,
     Integer,

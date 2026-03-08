@@ -1,0 +1,31 @@
+name: Weekly Data Collection
+
+on:
+  schedule:
+    - cron: '0 22 * * 0'  # 9am Sydney = 10pm UTC (Sunday)
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          python -m spacy download en_core_web_md
+      
+      - name: Run collection
+        env:
+          EBAY_APP_ID: ${{ secrets.EBAY_APP_ID }}
+          EBAY_CERT_ID: ${{ secrets.EBAY_CERT_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python scripts/collect_weekly.py

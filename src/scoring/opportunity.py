@@ -1,3 +1,9 @@
+"""
+Opportunity scoring - calculates and ranks market opportunities.
+
+Uses weighted features to produce a 0-100 score per keyword.
+"""
+
 WEIGHTS = {
     "trend_momentum": 0.3,
     "trend_acceleration": 0.2,

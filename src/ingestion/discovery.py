@@ -4,8 +4,8 @@ Discovery pipeline - finds trending products with low competition.
 Ties together eBay browsing, keyword extraction, and Google Trends.
 """
 
-from ebay_scraper import browse_category, extract_keywords
-from google_trends import fetch_trends, filter_rising_keywords
+from ingestion.ebay_scraper import browse_category, extract_keywords
+from ingestion.google_trends import fetch_trends, filter_rising_keywords
 
 
 # eBay category IDs (for reference)

@@ -1,1 +1,1 @@
-# Data ingestion modules
+"""Data ingestion modules - eBay scraping and Google Trends."""
